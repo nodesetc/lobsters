@@ -79,7 +79,7 @@ class Comment < ApplicationRecord
     self.comment.to_s.strip.match(/\Atl;?dr.?$\z/i) &&
       errors.add(:base, "Wow!  A blue car!")
 
-    self.comment.to_s.strip.match(/\Ame too.?\z/i) &&
+    self.comment.to_s.strip.match(/\A(me too|nice)([\.!])?\z/i) &&
       errors.add(:base, "Please just upvote the parent post instead.")
 
     self.hat.present? && self.user.wearable_hats.exclude?(self.hat) &&
@@ -232,6 +232,8 @@ class Comment < ApplicationRecord
       end
 
       m.save
+
+      User.update_counters self.user_id, karma: (self.votes.count * -2)
     end
 
     self.save(:validate => false)
